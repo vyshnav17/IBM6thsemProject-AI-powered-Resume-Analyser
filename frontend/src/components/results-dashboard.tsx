@@ -49,6 +49,15 @@ export function ResultsDashboard({ analysis, onNewAnalysis }: ResultsDashboardPr
     });
   };
 
+  const downloadOriginal = () => {
+    window.location.href = `/api/analyzer/download-original/${analysis.id}`;
+
+    toast({
+      title: "Downloading Original",
+      description: "Fetching your original uploaded document...",
+    });
+  };
+
   const shareResults = async () => {
     const shareText = `I analyzed my resume and scored ${analysis.overallScore}/100! Key strengths: ${analysis.strengths.map(s => s.title).join(', ')}.`;
 
@@ -206,6 +215,14 @@ export function ResultsDashboard({ analysis, onNewAnalysis }: ResultsDashboardPr
                 Download Report
               </Button>
               <Button
+                onClick={downloadOriginal}
+                variant="outline"
+                className="border-white/20 text-white hover:bg-white/10"
+              >
+                <FileText className="w-4 h-4 mr-2" />
+                Original File
+              </Button>
+              <Button
                 onClick={shareResults}
                 variant="outline"
                 className="border-white/20 text-white hover:bg-white/10"
@@ -357,10 +374,10 @@ export function ResultsDashboard({ analysis, onNewAnalysis }: ResultsDashboardPr
           Generate PDF Report
         </Button>
         <Button
-          onClick={() => toast({
-            title: "Resume Builder",
-            description: "Resume builder feature coming soon! Use our analysis to improve your current resume.",
-          })}
+          onClick={() => {
+            // This is a bit hacky but we'll use a custom event or let the parent handle it
+            window.dispatchEvent(new CustomEvent('change-view', { detail: 'builder' }));
+          }}
           variant="outline"
           className="px-8 py-6 rounded-xl border-white/20 text-white hover:bg-white/10 font-medium"
         >

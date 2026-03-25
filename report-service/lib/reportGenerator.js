@@ -5,43 +5,70 @@ import PDFDocument from "pdfkit";
  */
 export async function generateResumePDF(text) {
     return new Promise((resolve, reject) => {
-        const doc = new PDFDocument({ margin: 50 });
+        const doc = new PDFDocument({ margin: 50, autoFirstPage: true });
         const chunks = [];
 
         doc.on("data", (chunk) => chunks.push(chunk));
         doc.on("end", () => resolve(Buffer.concat(chunks)));
         doc.on("error", (err) => reject(err));
 
-        // Styles
+        // Fonts
         const titleFont = "Helvetica-Bold";
         const bodyFont = "Helvetica";
+        const lightFont = "Helvetica-Oblique";
 
-        // Parse the optimized resume text
         const lines = text.split("\n");
+        let isFirstLine = true;
 
-        lines.forEach((line) => {
-            const trimmedLine = line.trim();
-            if (!trimmedLine) {
-                doc.moveDown();
+        lines.forEach((originalLine) => {
+            let line = originalLine.trim();
+
+            if (!line) {
+                doc.moveDown(0.5);
                 return;
             }
 
-            // Check for section headers (capitalized words like PROFESSIONAL SUMMARY)
-            if (/^[A-Z\s]{5,}$/.test(trimmedLine) || trimmedLine.endsWith(":")) {
-                doc.font(titleFont).fontSize(14).fillColor("#1e40af").text(trimmedLine);
+            // Remove AI intros like "Here's an optimized version..."
+            if (isFirstLine && line.toLowerCase().includes("here's an optimized") || line.toLowerCase().includes("here is the optimized")) {
+                return; // Skip this conversational AI intro
+            }
+
+            // Is this a purely bold header? e.g. **Contact Information**
+            const isBoldHeader = /^(\*\*|__)(.*?)\1:?$/.test(line);
+            
+            // Clean markdown bold tags from anywhere in the string
+            line = line.replace(/\*\*|__/g, "");
+
+            // Name / Title at the very top
+            if (isFirstLine) {
+                isFirstLine = false;
+                doc.font(titleFont).fontSize(24).fillColor("#111827").text(line, { align: 'center' });
                 doc.moveDown(0.5);
-                // Add a horizontal line
-                doc.moveTo(50, doc.y).lineTo(550, doc.y).strokeColor("#e5e7eb").stroke();
+                return;
+            }
+
+            // Section Headers (either all caps, or bold headers like **Experience**)
+            if (isBoldHeader || /^[A-Z\s]{5,}$/.test(line)) {
+                doc.moveDown();
+                doc.font(titleFont).fontSize(14).fillColor("#1e40af").text(line.toUpperCase());
+                doc.moveDown(0.3);
+                // Subtle divider
+                doc.moveTo(50, doc.y).lineTo(545, doc.y).lineWidth(1).strokeColor("#e5e7eb").stroke();
                 doc.moveDown(0.5);
             }
-            // Check for bullet points
-            else if (trimmedLine.startsWith("•") || trimmedLine.startsWith("-") || trimmedLine.startsWith("*")) {
+            // Bullet points
+            else if (line.startsWith("•") || line.startsWith("-") || line.startsWith("*")) {
+                const cleanLine = line.replace(/^[\s\*\-\•]+/, "");
                 doc.font(bodyFont).fontSize(11).fillColor("#374151")
-                    .text(trimmedLine, { indent: 15, paragraphGap: 5 });
+                   .text(`•  ${cleanLine}`, { indent: 15, paragraphGap: 2 });
             }
-            // Normal text
+            // Roles / Dates (Typical subheader patterns like "Software Engineer | 2020 - Present")
+            else if (line.includes("|") || line.match(/\d{4}\s*-\s*(Present|\d{4})/i)) {
+                doc.font(titleFont).fontSize(12).fillColor("#1f2937").text(line, { paragraphGap: 2 });
+            }
+            // Normal Text
             else {
-                doc.font(bodyFont).fontSize(11).fillColor("#374151").text(trimmedLine);
+                doc.font(bodyFont).fontSize(11).fillColor("#4b5563").text(line, { paragraphGap: 2 });
             }
         });
 
@@ -111,6 +138,70 @@ export async function generateReportPDF(analysis) {
             }
             doc.moveDown(0.5);
         });
+
+        doc.end();
+    });
+}
+/**
+ * Generates a professional PDF from structured builder resume data.
+ */
+export async function generateBuilderResumePDF(data) {
+    return new Promise((resolve, reject) => {
+        const doc = new PDFDocument({ margin: 50, autoFirstPage: true });
+        const chunks = [];
+
+        doc.on("data", (chunk) => chunks.push(chunk));
+        doc.on("end", () => resolve(Buffer.concat(chunks)));
+        doc.on("error", (err) => reject(err));
+
+        const { personalInfo, summary, experience, skills } = data;
+
+        // Header - Name
+        doc.font("Helvetica-Bold").fontSize(24).fillColor("#111827").text(personalInfo.fullName || "Name", { align: 'center' });
+        doc.moveDown(0.2);
+
+        // Contact Info
+        const contactLine = [personalInfo.email, personalInfo.phone, personalInfo.location]
+            .filter(Boolean)
+            .join("  |  ");
+        doc.font("Helvetica").fontSize(10).fillColor("#4b5563").text(contactLine, { align: 'center' });
+        doc.moveDown(1);
+
+        // Summary
+        if (summary) {
+            doc.font("Helvetica-Bold").fontSize(14).fillColor("#1e40af").text("PROFESSIONAL SUMMARY");
+            doc.moveDown(0.3);
+            doc.moveTo(50, doc.y).lineTo(545, doc.y).lineWidth(1).strokeColor("#e5e7eb").stroke();
+            doc.moveDown(0.5);
+            doc.font("Helvetica").fontSize(11).fillColor("#374151").text(summary, { paragraphGap: 10 });
+        }
+
+        // Experience
+        if (experience && experience.length > 0) {
+            doc.moveDown();
+            doc.font("Helvetica-Bold").fontSize(14).fillColor("#1e40af").text("WORK EXPERIENCE");
+            doc.moveDown(0.3);
+            doc.moveTo(50, doc.y).lineTo(545, doc.y).lineWidth(1).strokeColor("#e5e7eb").stroke();
+            doc.moveDown(0.5);
+
+            experience.forEach(exp => {
+                doc.font("Helvetica-Bold").fontSize(12).fillColor("#111827").text(`${exp.position} at ${exp.company}`);
+                doc.font("Helvetica-Oblique").fontSize(10).fillColor("#6b7280").text(exp.duration);
+                doc.moveDown(0.3);
+                doc.font("Helvetica").fontSize(11).fillColor("#374151").text(exp.description, { paragraphGap: 5 });
+                doc.moveDown(0.8);
+            });
+        }
+
+        // Skills
+        if (skills && skills.length > 0) {
+            doc.moveDown();
+            doc.font("Helvetica-Bold").fontSize(14).fillColor("#1e40af").text("SKILLS");
+            doc.moveDown(0.3);
+            doc.moveTo(50, doc.y).lineTo(545, doc.y).lineWidth(1).strokeColor("#e5e7eb").stroke();
+            doc.moveDown(0.5);
+            doc.font("Helvetica").fontSize(11).fillColor("#374151").text(skills.join(", "), { paragraphGap: 10 });
+        }
 
         doc.end();
     });

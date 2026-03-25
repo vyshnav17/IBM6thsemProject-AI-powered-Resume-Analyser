@@ -1,16 +1,17 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { UploadSection } from "@/components/upload-section";
 import { ResultsDashboard } from "@/components/results-dashboard";
 import { Button } from "@/components/ui/button";
-import { Sparkles, Plus, Loader2, LogOut, LayoutDashboard, History } from "lucide-react";
+import { Sparkles, Plus, Loader2, LogOut, LayoutDashboard, History, TrendingUp } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import type { ResumeAnalysis } from "@/lib/types";
 import { HistoryDashboard } from "@/components/history-dashboard";
+import { ResumeBuilder } from "@/components/resume-builder";
 
 export default function Home() {
   const { logoutMutation } = useAuth();
   const [analysis, setAnalysis] = useState<ResumeAnalysis | null>(null);
-  const [view, setView] = useState<'dashboard' | 'history'>('dashboard');
+  const [view, setView] = useState<'dashboard' | 'history' | 'builder'>('dashboard');
 
   const handleAnalysisComplete = (newAnalysis: ResumeAnalysis) => {
     setAnalysis(newAnalysis);
@@ -25,6 +26,17 @@ export default function Home() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  useEffect(() => {
+    const handleViewChange = (e: any) => {
+      if (e.detail === 'builder') {
+        setView('builder');
+        setAnalysis(null);
+      }
+    };
+    window.addEventListener('change-view', handleViewChange);
+    return () => window.removeEventListener('change-view', handleViewChange);
+  }, []);
+
   return (
     <div className="flex h-screen bg-[#09090b] text-white overflow-hidden relative">
       {/* Glowing Mesh Background */}
@@ -36,9 +48,6 @@ export default function Home() {
       <aside className="w-72 border-r border-white/10 bg-white/5 backdrop-blur-xl flex flex-col z-10 hidden md:flex">
         <div className="p-6 border-b border-white/10">
           <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-blue-500 rounded-xl flex items-center justify-center shadow-lg shadow-purple-500/20">
-              <Sparkles className="h-5 w-5 text-white" />
-            </div>
             <div>
               <h1 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-300 to-blue-300">CV AI Insights</h1>
               <p className="text-xs text-white/50 font-medium">Next-Gen Engine</p>
@@ -63,6 +72,11 @@ export default function Home() {
             <History className="w-4 h-4" />
             <span>History</span>
           </button>
+
+          <button onClick={() => { setView('builder'); setAnalysis(null); }} className={`w-full flex items-center space-x-3 px-4 py-3 hover:bg-white/5 transition-colors rounded-xl text-sm font-medium ${view === 'builder' ? 'bg-white/5 text-white border border-white/5' : 'text-white/70 border border-transparent'}`}>
+            <TrendingUp className="w-4 h-4" />
+            <span>Resume Builder</span>
+          </button>
         </div>
 
         <div className="p-4 border-t border-white/10">
@@ -86,7 +100,6 @@ export default function Home() {
       <main className="flex-1 overflow-y-auto z-10 relative">
         <div className="md:hidden p-4 border-b border-white/10 bg-white/5 backdrop-blur-md flex justify-between items-center z-20 sticky top-0">
           <div className="flex items-center space-x-2">
-            <Sparkles className="h-5 w-5 text-purple-400" />
             <span className="font-bold">CV AI</span>
           </div>
           <Button variant="ghost" size="sm" onClick={() => logoutMutation.mutate()}>
@@ -97,6 +110,8 @@ export default function Home() {
         <div className="p-6 lg:p-10 max-w-6xl mx-auto min-h-full flex flex-col">
           {view === 'history' ? (
              <HistoryDashboard onSelectAnalysis={(item) => { setAnalysis(item); setView('dashboard'); window.scrollTo(0,0); }} />
+          ) : view === 'builder' ? (
+             <ResumeBuilder initialAnalysis={analysis} />
           ) : analysis ? (
             <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
                <ResultsDashboard

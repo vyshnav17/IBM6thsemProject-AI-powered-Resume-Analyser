@@ -3,13 +3,14 @@
   "version": "1.0.0",
   "description": "Root package to run all microservices concurrently",
   "scripts": {
-    "install:all": "npm install && cd api-gateway && npm install && cd ../user-service && npm install && cd ../analyzer-service && npm install && cd ../report-service && npm install && cd ../notification-service && npm install && cd ../frontend && npm install",
-    "start": "concurrently \"npm run start:api\" \"npm run start:user\" \"npm run start:analyzer\" \"npm run start:report\" \"npm run start:notification\" \"npm run start:frontend\"",
+    "install:all": "npm install && cd api-gateway && npm install && cd ../user-service && npm install && cd ../analyzer-service && npm install && cd ../report-service && npm install && cd ../notification-service && npm install && cd ../builder-service && npm install && cd ../frontend && npm install",
+    "start": "concurrently \"npm run start:api\" \"npm run start:user\" \"npm run start:analyzer\" \"npm run start:report\" \"npm run start:notification\" \"npm run start:builder\" \"npm run start:frontend\"",
     "start:api": "cd api-gateway && npm run dev",
     "start:user": "cd user-service && npm run dev",
     "start:analyzer": "cd analyzer-service && npm run dev",
     "start:report": "cd report-service && npm run dev",
     "start:notification": "cd notification-service && npm run dev",
+    "start:builder": "cd builder-service && npm run dev",
     "start:frontend": "cd frontend && npm run dev"
   },
   "dependencies": {

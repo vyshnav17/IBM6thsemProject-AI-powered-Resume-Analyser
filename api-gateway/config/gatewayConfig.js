@@ -6,4 +6,5 @@ export default {
     ANALYZER_SERVICE_URL: process.env.ANALYZER_SERVICE_URL || 'http://localhost:5002',
     REPORT_SERVICE_URL: process.env.REPORT_SERVICE_URL || 'http://localhost:5003',
     NOTIFICATION_SERVICE_URL: process.env.NOTIFICATION_SERVICE_URL || 'http://localhost:5004',
+    BUILDER_SERVICE_URL: process.env.BUILDER_SERVICE_URL || 'http://localhost:5005'
 };

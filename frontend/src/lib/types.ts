@@ -1,5 +1,5 @@
 export interface ResumeAnalysis {
-  id: number;
+  id: string;
   fileName: string;
   fileSize: number;
   extractedText: string;
@@ -31,6 +31,7 @@ export interface ResumeAnalysis {
     title: string;
     description: string;
   }>;
+  optimizedResume?: string;
   createdAt: string;
 }
 

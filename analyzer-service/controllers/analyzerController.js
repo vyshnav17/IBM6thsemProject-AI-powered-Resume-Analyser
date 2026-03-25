@@ -37,6 +37,8 @@ export const uploadAndAnalyze = async (req, res) => {
         // Save to Database
         const analysis = await ResumeAnalysis.create({
             userId: req.user.id,
+            originalFile: req.file.buffer,
+            originalFileType: req.file.mimetype,
             ...analysisData
         });
 
@@ -81,6 +83,27 @@ export const getHistory = async (req, res) => {
     } catch (error) {
         console.error("Get history error:", error);
         res.status(500).json({ error: error.message || "Failed to fetch history" });
+    }
+};
+
+export const downloadOriginal = async (req, res) => {
+    try {
+        const id = req.params.id;
+        const analysis = await ResumeAnalysis.findById(id);
+
+        if (!analysis || !analysis.originalFile) {
+            return res.status(404).json({ error: "Original file not found" });
+        }
+
+        res.setHeader("Content-Type", analysis.originalFileType || "application/pdf");
+        res.setHeader(
+            "Content-Disposition",
+            `attachment; filename="original-${analysis.fileName || 'resume.pdf'}"`
+        );
+        res.send(analysis.originalFile);
+    } catch (error) {
+        console.error("Download original error:", error);
+        res.status(500).json({ error: "Failed to download original file" });
     }
 };
 

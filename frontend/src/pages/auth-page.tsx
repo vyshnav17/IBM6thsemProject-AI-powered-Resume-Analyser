@@ -54,9 +54,6 @@ export default function AuthPage() {
 
             <div className="hidden lg:flex flex-col justify-center p-12 bg-white/5 backdrop-blur-lg border-l border-white/10 z-10 relative">
                 <div className="max-w-lg mx-auto">
-                    <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-blue-500 rounded-2xl flex items-center justify-center mb-8 shadow-lg shadow-purple-500/20 border border-white/20">
-                        <Sparkles className="h-10 w-10 text-white" />
-                    </div>
                     <h1 className="text-4xl lg:text-5xl font-extrabold mb-6 text-transparent bg-clip-text bg-gradient-to-br from-white to-white/60 leading-tight">
                         Land your dream job with AI-powered resume analysis.
                     </h1>

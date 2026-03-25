@@ -96,11 +96,15 @@ export async function generateOptimizedResumeWithAI(analysis) {
     Based on the following resume analysis, generate an optimized version of the resume.
     Focus on improving the professional summary, enhancing the experience descriptions with better action verbs and metrics, and organizing skills for maximum ATS impact.
 
+    CRITICAL INSTRUCTIONS:
+    1. DO NOT use any placeholders like [Insert Name], [Company Name], [Your Email], etc. You MUST use the actual factual information from the Resume Text provided below. If a piece of contact information is missing, do not include it at all.
+    2. Format the output as a professional resume in plain text.
+    3. Use EXACTLY \`**Section Name**\` (asterisks) for all main section headers (e.g., **Contact Information**, **Experience**, etc.). DO NOT use \`###\` or any other markdown header syntax.
+    4. Use \`-\` or \`*\` for all bullet points.
+
     Analysis: ${JSON.stringify(analysis)}
 
     Resume Text: ${analysis.extractedText}
-
-    Format the output as a professional resume in plain text, with clear section headers and bullet points.
   `;
 
     try {

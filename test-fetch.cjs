@@ -1,0 +1,5 @@
+const url = "http://localhost:5002/internal/analysis/";
+const goodId = "5f9c9f2f8b2d3c1a2b3c4d5e";
+fetch(url + goodId)
+.then(res => res.text().then(text => console.log("Status:", res.status, "Body:", text)))
+.catch(err => console.error("Error:", err));

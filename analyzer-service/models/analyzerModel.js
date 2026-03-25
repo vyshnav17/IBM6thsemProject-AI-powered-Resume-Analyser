@@ -6,6 +6,18 @@ const resumeAnalysisSchema = new mongoose.Schema({
         required: true,
         index: true
     },
+    fileName: {
+        type: String,
+        default: 'resume.pdf'
+    },
+    fileSize: {
+        type: Number,
+        default: 0
+    },
+    extractedText: {
+        type: String,
+        default: ''
+    },
     overallScore: {
         type: Number,
         required: true
@@ -36,9 +48,24 @@ const resumeAnalysisSchema = new mongoose.Schema({
         title: String,
         status: String,
         description: String
-    }]
+    }],
+    originalFile: {
+        type: Buffer
+    },
+    originalFileType: {
+        type: String
+    }
 }, {
-    timestamps: true
+    timestamps: true,
+    toJSON: {
+        virtuals: true,
+        transform: function (doc, ret) {
+            delete ret._id;
+            delete ret.__v;
+            delete ret.originalFile;
+            delete ret.originalFileType;
+        }
+    }
 });
 
 export const ResumeAnalysis = mongoose.model('ResumeAnalysis', resumeAnalysisSchema);
