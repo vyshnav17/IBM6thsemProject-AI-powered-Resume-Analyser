@@ -79,13 +79,13 @@ export function UploadSection({ onAnalysisComplete }: UploadSectionProps) {
 
   return (
     <div className="max-w-4xl mx-auto">
-      <div className="text-center mb-8">
-        <h2 className="text-3xl font-bold text-gray-900 mb-4">
+      <div className="text-center mb-10 relative z-10">
+        <h2 className="text-4xl md:text-5xl font-extrabold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-purple-400 via-pink-400 to-blue-400 drop-shadow-sm">
           Get Your Resume Score in Seconds
         </h2>
-        <p className="text-lg text-gray-600 max-w-2xl mx-auto">
-          Upload your resume and receive an instant score out of 100, plus actionable
-          feedback to help you land your dream job.
+        <p className="text-lg text-white/60 max-w-2xl mx-auto font-medium">
+          Upload your CV to receive an instant, AI-driven score out of 100, plus actionable
+          feedback to help you land your dream role.
         </p>
       </div>
 
@@ -96,8 +96,8 @@ export function UploadSection({ onAnalysisComplete }: UploadSectionProps) {
       />
 
       {/* Sample Resume Cards */}
-      <div className="mt-12">
-        <h3 className="text-lg font-semibold text-gray-900 mb-6 text-center">
+      <div className="mt-12 bg-white/5 backdrop-blur-xl border border-white/10 rounded-3xl p-8 relative z-10 shadow-2xl">
+        <h3 className="text-xl font-semibold text-white mb-8 text-center">
           Try with Sample Resumes
         </h3>
         <div className="grid md:grid-cols-3 gap-6">
@@ -106,20 +106,20 @@ export function UploadSection({ onAnalysisComplete }: UploadSectionProps) {
             return (
               <Card
                 key={sample.id}
-                className="hover:shadow-md transition-shadow cursor-pointer"
+                className="hover:bg-white/10 transition-colors cursor-pointer bg-white/5 border-white/10 backdrop-blur-md shadow-lg"
                 onClick={() => handleSampleSelect(sample.id)}
               >
                 <CardContent className="p-6">
                   <div className="flex items-start space-x-4">
-                    <div className="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center">
-                      <IconComponent className="h-6 w-6 text-gray-600" />
+                    <div className="w-12 h-12 bg-gradient-to-br from-purple-500/20 to-blue-500/20 rounded-xl flex items-center justify-center border border-white/10 shadow-inner">
+                      <IconComponent className="h-6 w-6 text-purple-300" />
                     </div>
                     <div className="flex-1">
-                      <h4 className="font-medium text-gray-900">{sample.title}</h4>
-                      <p className="text-sm text-gray-600 mt-1">{sample.description}</p>
+                      <h4 className="font-bold text-white">{sample.title}</h4>
+                      <p className="text-sm text-white/50 mt-1">{sample.description}</p>
                       <Button
                         variant="link"
-                        className="text-primary p-0 h-auto font-medium mt-2 hover:underline"
+                        className="text-purple-400 p-0 h-auto font-medium mt-3 hover:underline hover:text-purple-300"
                         disabled={isLoading}
                       >
                         Analyze Sample →

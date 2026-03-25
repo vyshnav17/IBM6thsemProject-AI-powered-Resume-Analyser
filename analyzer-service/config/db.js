@@ -1,7 +1,13 @@
-// Simulated connection for AWT miniproject
+import mongoose from 'mongoose';
 
 export const connectDB = async () => {
-    console.log('Analyzer Service Database Connected (Simulated)');
+    try {
+        const conn = await mongoose.connect(process.env.MONGODB_URI);
+        console.log(`Analyzer Database Connected: ${conn.connection.host}`);
+    } catch (error) {
+        console.error(`Analyzer Error: ${error.message}`);
+        process.exit(1);
+    }
 };
 
 export default connectDB;

@@ -35,7 +35,10 @@ export const uploadAndAnalyze = async (req, res) => {
         );
 
         // Save to Database
-        const analysis = await ResumeAnalysis.create(analysisData);
+        const analysis = await ResumeAnalysis.create({
+            userId: req.user.id,
+            ...analysisData
+        });
 
         // Communicate with Notification Service (Fire and forget mock)
         fetch('http://localhost:5004/api/notifications/send-email', {
@@ -68,6 +71,16 @@ export const getAnalysisById = async (req, res) => {
         res.status(500).json({
             error: error.message || "Failed to get analysis"
         });
+    }
+};
+
+export const getHistory = async (req, res) => {
+    try {
+        const analyses = await ResumeAnalysis.find({ userId: req.user.id }).sort({ createdAt: -1 });
+        res.json(analyses);
+    } catch (error) {
+        console.error("Get history error:", error);
+        res.status(500).json({ error: error.message || "Failed to fetch history" });
     }
 };
 
@@ -172,7 +185,10 @@ Figma, Sketch, Adobe Creative Suite, Prototyping, User Research, Wireframing`;
         }
 
         const analysisData = await analyzeResumeWithAI(sampleText, fileName, 250000);
-        const analysis = await ResumeAnalysis.create(analysisData);
+        const analysis = await ResumeAnalysis.create({
+            userId: req.user.id,
+            ...analysisData
+        });
         res.json(analysis);
     } catch (error) {
         console.error("Sample analysis error:", error);

@@ -1,6 +1,7 @@
 import express from 'express';
 import multer from 'multer';
-import { uploadAndAnalyze, getAnalysisById, generateOptimized, getSampleAnalysis } from '../controllers/analyzerController.js';
+import { uploadAndAnalyze, getAnalysisById, generateOptimized, getSampleAnalysis, getHistory } from '../controllers/analyzerController.js';
+import { protect } from '../middleware/auth.js';
 
 const router = express.Router();
 
@@ -18,9 +19,10 @@ const upload = multer({
     },
 });
 
-router.post('/analyze-resume', upload.single("resume"), uploadAndAnalyze);
-router.get('/analysis/:id', getAnalysisById);
-router.post('/generate-optimized-resume/:id', generateOptimized);
-router.get('/sample-analysis/:sampleId', getSampleAnalysis);
+router.post('/analyze-resume', protect, upload.single("resume"), uploadAndAnalyze);
+router.get('/history', protect, getHistory);
+router.get('/analysis/:id', protect, getAnalysisById);
+router.post('/generate-optimized-resume/:id', protect, generateOptimized);
+router.get('/sample-analysis/:sampleId', protect, getSampleAnalysis);
 
 export default router;

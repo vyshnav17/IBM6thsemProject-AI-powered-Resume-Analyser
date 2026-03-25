@@ -2,126 +2,115 @@ import { useState } from "react";
 import { UploadSection } from "@/components/upload-section";
 import { ResultsDashboard } from "@/components/results-dashboard";
 import { Button } from "@/components/ui/button";
-import { FileText, Plus, Loader2 } from "lucide-react";
+import { Sparkles, Plus, Loader2, LogOut, LayoutDashboard, History } from "lucide-react";
 import { useAuth } from "@/hooks/use-auth";
 import type { ResumeAnalysis } from "@/lib/types";
+import { HistoryDashboard } from "@/components/history-dashboard";
 
 export default function Home() {
   const { logoutMutation } = useAuth();
   const [analysis, setAnalysis] = useState<ResumeAnalysis | null>(null);
+  const [view, setView] = useState<'dashboard' | 'history'>('dashboard');
 
   const handleAnalysisComplete = (newAnalysis: ResumeAnalysis) => {
     setAnalysis(newAnalysis);
+    setView('dashboard');
     // Scroll to top to show results
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleNewAnalysis = () => {
     setAnalysis(null);
+    setView('dashboard');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white shadow-sm border-b border-gray-200">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-3">
-              <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
-                <FileText className="h-6 w-6 text-white" />
-              </div>
-              <div>
-                <h1 className="text-xl font-semibold text-gray-900">Resume Grader</h1>
-                <p className="text-sm text-gray-600">AI-Powered Resume Analysis</p>
-              </div>
+    <div className="flex h-screen bg-[#09090b] text-white overflow-hidden relative">
+      {/* Glowing Mesh Background */}
+      <div className="absolute top-[-20%] left-[-10%] w-[500px] h-[500px] bg-purple-600/20 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute bottom-[-20%] right-[-10%] w-[500px] h-[500px] bg-blue-600/20 rounded-full blur-[120px] pointer-events-none" />
+      <div className="absolute top-[40%] left-[40%] w-[600px] h-[600px] bg-indigo-500/10 rounded-full blur-[150px] pointer-events-none" />
+
+      {/* Sidebar Navigation */}
+      <aside className="w-72 border-r border-white/10 bg-white/5 backdrop-blur-xl flex flex-col z-10 hidden md:flex">
+        <div className="p-6 border-b border-white/10">
+          <div className="flex items-center space-x-3">
+            <div className="w-10 h-10 bg-gradient-to-br from-purple-500 to-blue-500 rounded-xl flex items-center justify-center shadow-lg shadow-purple-500/20">
+              <Sparkles className="h-5 w-5 text-white" />
             </div>
-            <div className="flex items-center space-x-4">
-              <Button
-                onClick={handleNewAnalysis}
-                variant="outline"
-              >
-                <Plus className="w-4 h-4 mr-2" />
-                New Analysis
-              </Button>
-              <Button
-                onClick={() => logoutMutation.mutate()}
-                disabled={logoutMutation.isPending}
-                className="bg-primary hover:bg-blue-700 text-white"
-              >
-                {logoutMutation.isPending ? (
-                  <Loader2 className="h-4 w-4 animate-spin" />
-                ) : (
-                  "Logout"
-                )}
-              </Button>
+            <div>
+              <h1 className="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-purple-300 to-blue-300">CV AI Insights</h1>
+              <p className="text-xs text-white/50 font-medium">Next-Gen Engine</p>
             </div>
           </div>
         </div>
-      </header>
 
-      {/* Main Content */}
-      <main className="container mx-auto px-4 py-8">
-        {analysis ? (
-          <ResultsDashboard
-            analysis={analysis}
-            onNewAnalysis={handleNewAnalysis}
-          />
-        ) : (
-          <UploadSection onAnalysisComplete={handleAnalysisComplete} />
-        )}
+        <div className="flex-1 p-4 space-y-2 overflow-y-auto">
+          <div className="text-xs font-semibold text-white/40 uppercase tracking-wider mb-4 mt-2 px-2">Menu</div>
+          
+          <button onClick={handleNewAnalysis} className="w-full flex items-center space-x-3 px-4 py-3 bg-white/10 hover:bg-white/20 transition-all rounded-xl text-sm font-medium border border-white/5 shadow-sm">
+            <Plus className="w-4 h-4 text-purple-400" />
+            <span>New Analysis</span>
+          </button>
+          
+          <button onClick={() => setView('dashboard')} className={`w-full flex items-center space-x-3 px-4 py-3 hover:bg-white/5 transition-colors rounded-xl text-sm font-medium ${view === 'dashboard' ? 'bg-white/5 text-white border border-white/5' : 'text-white/70 border border-transparent'}`}>
+            <LayoutDashboard className="w-4 h-4" />
+            <span>Dashboard</span>
+          </button>
+
+          <button onClick={() => { setView('history'); setAnalysis(null); }} className={`w-full flex items-center space-x-3 px-4 py-3 hover:bg-white/5 transition-colors rounded-xl text-sm font-medium ${view === 'history' ? 'bg-white/5 text-white border border-white/5' : 'text-white/70 border border-transparent'}`}>
+            <History className="w-4 h-4" />
+            <span>History</span>
+          </button>
+        </div>
+
+        <div className="p-4 border-t border-white/10">
+          <Button
+            onClick={() => logoutMutation.mutate()}
+            disabled={logoutMutation.isPending}
+            variant="ghost"
+            className="w-full justify-start text-white/70 hover:text-white hover:bg-white/10 rounded-xl"
+          >
+            {logoutMutation.isPending ? (
+              <Loader2 className="h-4 w-4 animate-spin mr-2" />
+            ) : (
+              <LogOut className="h-4 w-4 mr-2" />
+            )}
+            Logout
+          </Button>
+        </div>
+      </aside>
+
+      {/* Main Content Area */}
+      <main className="flex-1 overflow-y-auto z-10 relative">
+        <div className="md:hidden p-4 border-b border-white/10 bg-white/5 backdrop-blur-md flex justify-between items-center z-20 sticky top-0">
+          <div className="flex items-center space-x-2">
+            <Sparkles className="h-5 w-5 text-purple-400" />
+            <span className="font-bold">CV AI</span>
+          </div>
+          <Button variant="ghost" size="sm" onClick={() => logoutMutation.mutate()}>
+            <LogOut className="h-4 w-4" />
+          </Button>
+        </div>
+
+        <div className="p-6 lg:p-10 max-w-6xl mx-auto min-h-full flex flex-col">
+          {view === 'history' ? (
+             <HistoryDashboard onSelectAnalysis={(item) => { setAnalysis(item); setView('dashboard'); window.scrollTo(0,0); }} />
+          ) : analysis ? (
+            <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+               <ResultsDashboard
+                 analysis={analysis}
+                 onNewAnalysis={handleNewAnalysis}
+               />
+            </div>
+          ) : (
+            <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 flex-1 flex flex-col justify-center">
+               <UploadSection onAnalysisComplete={handleAnalysisComplete} />
+            </div>
+          )}
+        </div>
       </main>
-
-      {/* Footer */}
-      <footer className="bg-white border-t border-gray-200 mt-16">
-        <div className="container mx-auto px-4 py-8">
-          <div className="grid md:grid-cols-4 gap-8">
-            <div>
-              <div className="flex items-center space-x-3 mb-4">
-                <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-                  <FileText className="h-4 w-4 text-white" />
-                </div>
-                <span className="font-semibold text-gray-900">Resume Grader</span>
-              </div>
-              <p className="text-sm text-gray-600">
-                AI-powered resume analysis to help you land your dream job.
-              </p>
-            </div>
-            <div>
-              <h4 className="font-medium text-gray-900 mb-3">Product</h4>
-              <ul className="space-y-2 text-sm text-gray-600">
-                <li><a href="#" className="hover:text-primary">Resume Analysis</a></li>
-                <li><a href="#" className="hover:text-primary">Resume Builder</a></li>
-                <li><a href="#" className="hover:text-primary">Career Tips</a></li>
-                <li><a href="#" className="hover:text-primary">Industry Insights</a></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-medium text-gray-900 mb-3">Resources</h4>
-              <ul className="space-y-2 text-sm text-gray-600">
-                <li><a href="#" className="hover:text-primary">Resume Templates</a></li>
-                <li><a href="#" className="hover:text-primary">Writing Guide</a></li>
-                <li><a href="#" className="hover:text-primary">Interview Prep</a></li>
-                <li><a href="#" className="hover:text-primary">Job Search Tips</a></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-medium text-gray-900 mb-3">Company</h4>
-              <ul className="space-y-2 text-sm text-gray-600">
-                <li><a href="#" className="hover:text-primary">About Us</a></li>
-                <li><a href="#" className="hover:text-primary">Privacy Policy</a></li>
-                <li><a href="#" className="hover:text-primary">Terms of Service</a></li>
-                <li><a href="#" className="hover:text-primary">Contact</a></li>
-              </ul>
-            </div>
-          </div>
-          <div className="border-t border-gray-200 mt-8 pt-8 text-center">
-            <p className="text-sm text-gray-600">
-              &copy; 2026 Resume Grader. All rights reserved.
-            </p>
-          </div>
-        </div>
-      </footer>
     </div>
   );
 }

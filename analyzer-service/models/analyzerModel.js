@@ -1,15 +1,44 @@
-// Simulated Database Table
-const analyses = new Map();
-let currentAnalysisId = 1;
+import mongoose from 'mongoose';
 
-export const ResumeAnalysis = {
-    create: async (analysisData) => {
-        const id = currentAnalysisId++;
-        const analysis = { id, createdAt: new Date(), ...analysisData };
-        analyses.set(id, analysis);
-        return analysis;
+const resumeAnalysisSchema = new mongoose.Schema({
+    userId: {
+        type: String, // Maps to the user ID provided by JWT
+        required: true,
+        index: true
     },
-    findById: async (id) => {
-        return analyses.get(parseInt(id));
-    }
-};
+    overallScore: {
+        type: Number,
+        required: true
+    },
+    scores: {
+        formatting: Number,
+        content: Number,
+        keywords: Number,
+        experience: Number
+    },
+    strengths: [{
+        title: String,
+        description: String
+    }],
+    recommendations: [{
+        title: String,
+        description: String,
+        example: String
+    }],
+    sectionAnalysis: {
+        contact: Number,
+        summary: Number,
+        experience: Number,
+        education: Number,
+        skills: Number
+    },
+    atsCompatibility: [{
+        title: String,
+        status: String,
+        description: String
+    }]
+}, {
+    timestamps: true
+});
+
+export const ResumeAnalysis = mongoose.model('ResumeAnalysis', resumeAnalysisSchema);

@@ -2,8 +2,10 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import analyzerRoutes from './routes/analyzerRoutes.js';
+import connectDB from './config/db.js';
 
 dotenv.config({ path: '../.env' });
+connectDB();
 
 const app = express();
 const PORT = process.env.PORT || 5002;
